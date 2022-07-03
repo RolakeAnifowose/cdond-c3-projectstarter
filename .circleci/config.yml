@@ -161,28 +161,38 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              #--tags project=your-tag \
-              # --stack-name "your back-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
-              exit 1
+              --tags project=udapeople-backend-${CIRCLE_WORKFLOW_ID} \
+               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}" \
+               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}"
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              #--tags project=your-tag \
-              # --stack-name "your back-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
-              exit 1
+              --tags project=udapeople-frontend-${CIRCLE_WORKFLOW_ID} \
+               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID}" \
+               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            # Your code here
-            exit 1
+            INSTANCE_IP=$(aws ec2 describe-instances \
+            --filters Name=tag:Name,Values=backend-$CIRCLE_WORKFLOW_ID \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --output text >> ./.circleci/ansible/inventory.txt)
+
+            echo ${INSTANCE_IP} >> ./.circleci/ansible/inventory.txt
+            echo INSTANCE_IP ${INSTANCE_IP}
+            curl -H "Content-Type: text/plain" -H "token: 043f824b-14a1-4bbf-967c-60cecdfc4712" \
+            --request PUT \
+            --data "$INSTANCE_IP" https://api.memstash.io/values/INSTANCE_IP
+      - run:
+          name: Tar dependency
+          command: |
+            yum -y install tar gzip jq npm
       - persist_to_workspace:
-          root: ~/
+          root: .circleci/ansible
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - inventory.txt
       # Here's where you will add some code to rollback on failure      
 
   # configure-infrastructure:

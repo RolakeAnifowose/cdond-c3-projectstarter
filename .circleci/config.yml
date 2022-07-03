@@ -183,7 +183,7 @@ jobs:
             echo ${INSTANCE_IP} >> ./.circleci/ansible/inventory.txt
             echo INSTANCE_IP ${INSTANCE_IP}
             curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/IPs \
-            -d $INSTANCE_IP
+            -d '$INSTANCE_IP'
       - run:
           name: Tar dependency
           command: |

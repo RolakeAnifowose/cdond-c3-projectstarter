@@ -182,9 +182,9 @@ jobs:
 
             echo ${INSTANCE_IP} >> ./.circleci/ansible/inventory.txt
             echo INSTANCE_IP ${INSTANCE_IP}
-            curl -H "Content-Type:text/plain" -H "token: 043f824b-14a1-4bbf-967c-60cecdfc4712" \
-            --request PUT \
-            --data "$INSTANCE_IP" https://api.memstash.io/values/INSTANCE_IP
+            curl https://kvdb.io/BUCKET/KEY?access_token=K5bz9MUV2hetKccYYUL94K
+            # --request PUT \
+            # --data "$INSTANCE_IP" https://api.memstash.io/values/INSTANCE_IP
       - run:
           name: Tar dependency
           command: |

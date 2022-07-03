@@ -182,8 +182,8 @@ jobs:
 
             echo ${INSTANCE_IP} >> ./.circleci/ansible/inventory.txt
             echo INSTANCE_IP ${INSTANCE_IP}
-            curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/IPs \
-            -d '$INSTANCE_IP'
+            curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/IP \
+            -d ${INSTANCE_IP}
       - run:
           name: Tar dependency
           command: |
@@ -196,66 +196,97 @@ jobs:
 
   # configure-infrastructure:
   #   docker:
-  #     # Docker image here that supports Ansible
+  #     - image: python:3.7-alpine3.12
   #   steps:
-  #     # Checkout code from git
-  #     # Add ssh keys with fingerprint
-  #     # attach workspace
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["8a:eb:67:5d:01:db:0f:c4:93:33:85:db:10:3d:4d:84:26:62:f9:5c"]
+  #     - attach_workspace:
+  #         at: ./.circleci/ansible
   #     - run:
   #         name: Install dependencies
   #         command: |
-  #           # Your code here
-  #           exit 1
+  #           apk add --no-cache \
+  #               python3 \
+  #               py3-pip \
+  #           && pip3 install --upgrade pip \
+  #           && pip3 install \
+  #               awscli \
+  #           && rm -rf /var/cache/apk/*
+  #           apk add --update ansible
+  #     - run:
+  #         name: verify ansible hosts
+  #         command: |
+  #           ansible all --list-hosts
   #     - run:
   #         name: Configure server
+  #         working_directory: ./.circleci/ansible
   #         command: |
-  #           # Your code here
-  #           exit 1
+  #           echo PWD $(pwd)
+  #           ansible-playbook -i inventory.txt configure-server.yml
   #     # Here's where you will add some code to rollback on failure      
 
   # run-migrations:
   #   docker:
-  #     # Docker image here that supports NodeJS
+  #     - image: circleci/node:13.8.0
   #   steps:
-  #     # Checkout code from git
+  #     - checkout
   #     - run:
   #         name: Run migrations
   #         command: |
-  #           # Your code here
-  #           exit 1
+  #           cd backend 
+  #           npm install
+  #           touch migrations.txt
+  #           npm run migrations >> migrations.txt
+  #           cat migrations.txt
   #     - run:
-  #         name: Send migration results to memstash
+  #         name: Send migration results to kvdb
   #         command: |
-  #           # Your code here
-  #           exit 1
-  #    # Here's where you will add some code to rollback on failure      
+  #           if grep -q "has been executed successfully." migrations.txt
+  #           then
+  #           curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/Migrations \
+  #           curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" \
+  #           --request PUT \
+  #           --data "1" https://api.memstash.io/values/migration-${CIRCLE_WORKFLOW_ID}
+  #           else
+  #           curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" \
+  #           --request PUT \
+  #           --data "0" https://api.memstash.io/values/migration-${CIRCLE_WORKFLOW_ID}
+  #           fi
+  # #    # Here's where you will add some code to rollback on failure      
 
   # deploy-frontend:
   #   docker:
-  #     # Docker image here that supports AWS CLI
+  #     - image: amazon/aws-cli
   #   steps:
-  #     # Checkout code from git
+  #     - checkout
   #     - run:
   #         name: Install dependencies
   #         command: |
-  #           # your code here
+  #           curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+  #           yum -y install nodejs
+  #           yum -y install tar gzip
   #     - run:
   #         name: Get backend url
   #         command: |
-  #           # your code here
+  #           BACKEND_IP=$(curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/IPs)
   #           export API_URL="http://${BACKEND_IP}:3030"
   #           echo "${API_URL}"
+  #           cd frontend
+  #           npm install
+  #           npm run build
+  #           ls -alh
   #     - run:
   #         name: Deploy frontend objects
   #         command: |
-  #           # your code here
+  #           aws s3 cp ./frontend/dist s3://udapeople-${CIRCLE_WORKFLOW_ID}/ --recursive
       # Here's where you will add some code to rollback on failure      
                     
   # deploy-backend:
   #   docker:
-  #     # Docker image here that supports Ansible
+  #     - image: amazon/aws-cli
   #   steps:
-  #     # Checkout code from git
+  #     - checkout
   #     # Add ssh keys with fingerprint
   #     # attach workspace
   #     - run:

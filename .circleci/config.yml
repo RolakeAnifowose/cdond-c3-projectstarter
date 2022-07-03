@@ -175,15 +175,21 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            INSTANCE_IP=$(aws ec2 describe-instances \
+            # INSTANCE_IP=$(aws ec2 describe-instances \
+            # --filters Name=tag:Name,Values=backend-$CIRCLE_WORKFLOW_ID \
+            # --query "Reservations[*].Instances[*].PublicIpAddress" \
+            # --output text >> ./.circleci/ansible/inventory.txt)
+
+            # echo ${INSTANCE_IP} >> ./.circleci/ansible/inventory.txt
+            # echo INSTANCE_IP ${INSTANCE_IP}
+            curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/IP \
+            -d INSTANCE_IP=$(aws ec2 describe-instances \
             --filters Name=tag:Name,Values=backend-$CIRCLE_WORKFLOW_ID \
             --query "Reservations[*].Instances[*].PublicIpAddress" \
             --output text >> ./.circleci/ansible/inventory.txt)
 
             echo ${INSTANCE_IP} >> ./.circleci/ansible/inventory.txt
             echo INSTANCE_IP ${INSTANCE_IP}
-            curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/IP \
-            -d $'{INSTANCE_IP}'
       - run:
           name: Tar dependency
           command: |

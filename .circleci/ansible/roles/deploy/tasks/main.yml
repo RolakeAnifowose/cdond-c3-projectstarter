@@ -1,8 +1,33 @@
+- name: Create a directory if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: /home/ubuntu/project/backend
+    state: directory
+    mode: '0755'
+
+- name: "copy folder "
+  become: true
+  copy:
+    #src: /root/project/backend/dist
+    src: /root/project/backend/artifact.tar.gz
+    #src: /root/project/
+    dest: /home/ubuntu/project/backend
+
+- name: "untar folder "
+  become: true
+  ansible.builtin.unarchive:
+    #src: /root/project/backend/dist
+    src: /home/ubuntu/project/backend/artifact.tar.gz
+    #src: /root/project/
+    dest: /home/ubuntu/project/backend/
+    remote_src: yes
+
 - name: "start server"
   become: true
-  command: pm2 start -f ./main.js
-  args:
-    chdir: /home/ubuntu/uda_app/dist
+  command: |
+    npm install
+    pm2 stop default
+    pm2 start npm -- start
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
     - TYPEORM_MIGRATIONS_DIR: "./migrations"

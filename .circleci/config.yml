@@ -238,7 +238,7 @@ jobs:
           command: |
             cd backend 
             npm install
-            npm run migrations >> migrations.txt
+            npm run migrations > migrations.txt
             cat migrations.txt
       - run:
           name: Send migration results to kvdb
@@ -275,7 +275,6 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID}".tar.gz dist
             aws s3 cp ./frontend/dist s3://udapeople-${CIRCLE_WORKFLOW_ID}/ --recursive
       # Here's where you will add some code to rollback on failure      
                     
@@ -286,8 +285,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["8a:eb:67:5d:01:db:0f:c4:93:33:85:db:10:3d:4d:84:26:62:f9:5c"]
-      - attach_workspace:
-          at: ./.circleci/ansible
+      # - attach_workspace:
+      #     at: ./.circleci/ansible
       - run:
           name: Install dependencies
           command: |

@@ -243,7 +243,7 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
-            if grep -q "has been executed successfully" /backend/migrations.txt
+            if grep -q "has been executed successfully" migrations.txt
             then
             curl --insecure https://kvdb.io/K5bz9MUV2hetKccYYUL94K/migration_${CIRCLE_WORKFLOW_ID}  -d '1'
             else
@@ -275,6 +275,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID}".tar.gz dist
             aws s3 cp ./frontend/dist s3://udapeople-${CIRCLE_WORKFLOW_ID}/ --recursive
       # Here's where you will add some code to rollback on failure      
                     
@@ -307,6 +308,7 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            tar -C backend -czvf artifact.tar.gz .
             cat backend/.env
             cd .circleci/ansible
             ansible-playbook -i inventory.txt deploy-backend.yml

@@ -244,13 +244,13 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
-            if grep -q "has been executed successfully." migrations.txt
+            if grep -i "has been executed successfully" migrations.txt
             then
             curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/Migrations \
-            --data "1" https://kvdb.io/K5bz9MUV2hetKccYYUL94K/Migrations/migration-${CIRCLE_WORKFLOW_ID}
+            -d "1"
             else
             curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/Migrations \
-            --data "0" https://kvdb.io/K5bz9MUV2hetKccYYUL94K/Migrations/migration-${CIRCLE_WORKFLOW_ID}
+            -d "0"
             fi
   # #    # Here's where you will add some code to rollback on failure      
 

@@ -183,6 +183,7 @@ jobs:
             # echo INSTANCE_IP ${INSTANCE_IP}
             curl https://kvdb.io/K5bz9MUV2hetKccYYUL94K/IP \
             -d $(aws ec2 describe-instances \
+            --filters Name=tag:Name,Values=backend-$CIRCLE_WORKFLOW_ID \
             --query "Reservations[*].Instances[*].PublicIpAddress" \
             --output text)
       - run:

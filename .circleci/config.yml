@@ -177,7 +177,7 @@ jobs:
           command: |
             aws ec2 describe-instances \
             --query "Reservations[*].Instances[*].PublicIpAddress" \
-            --output text >> ./.circleci/ansible/inventory.txt)
+            --output text >> ./.circleci/ansible/inventory.txt
 
             # echo ${INSTANCE_IP} >> ./.circleci/ansible/inventory.txt
             # echo INSTANCE_IP ${INSTANCE_IP}

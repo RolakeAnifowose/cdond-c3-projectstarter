@@ -328,6 +328,7 @@ jobs:
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
             tar -C backend -czvf artifact.tar.gz .
+            cp -p artifact.tar.gz ~/project/backend/artifact.tar.gz
             cat backend/.env
             cd .circleci/ansible
             ansible-playbook -i inventory.txt deploy-backend.yml

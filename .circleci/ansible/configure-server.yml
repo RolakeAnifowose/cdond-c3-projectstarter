@@ -24,7 +24,7 @@
         state: latest
         update_cache: yes
 
-     - name: "install node.js"
+    - name: "install node.js"
       become: true
       apt:
         name: ["nodejs"]

@@ -1,3 +1,8 @@
+- name: Create a directory if it does not exist
+  file:
+    path: /home/ubuntu
+    state: directory
+
 - name: Extract artifact
   become: true
   unarchive:

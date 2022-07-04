@@ -280,18 +280,18 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.12
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints: ["8a:eb:67:5d:01:db:0f:c4:93:33:85:db:10:3d:4d:84:26:62:f9:5c"]
-      # - attach_workspace:
-      #     at: ./.circleci/ansible
+      - attach_workspace:
+          at: ./.circleci/ansible
       - run:
           name: Install dependencies
           command: |
-            apk add ansible
-            apk add curl
+            apk add --update ansible
+            apk add --update curl
             pip3 install awscli
       - run:
           name: Deploy backend

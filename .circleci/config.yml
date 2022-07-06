@@ -1,7 +1,6 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.10.1
   aws-cli: circleci/aws-cli@1.3.2
 
 
@@ -46,32 +45,6 @@ commands:
             fi
             
 jobs:
-  notify:
-    docker:
-      - image: 'cimg/base:stable'
-    steps:
-      - run:
-          name: fail_step
-          command: |
-
-      - slack/notify:
-          channel: '#adding-alerts'
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "Failure in build!"
-                    }
-                  ]
-                }
-              ]
-            }
-          event: fail
-
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -106,59 +79,59 @@ jobs:
           paths: [backend/node_modules]
           key: backend-build
 
-  test-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-    - checkout
-    - restore_cache:
-        keys: [frontend-build]
-    - run:
-        name: Front-end test
-        command: |
-           cd frontend
-           npm install
-           npm run test
+  # test-frontend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #   - checkout
+  #   - restore_cache:
+  #       keys: [frontend-build]
+  #   - run:
+  #       name: Front-end test
+  #       command: |
+  #          cd frontend
+  #          npm install
+  #          npm run test
                 
-  test-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-    - checkout
-    - restore_cache:
-        keys: [backend-build]
-    - run:
-        name: Back-end test
-        command: |
-           cd backend
-           npm install
-           npm run test
+  # test-backend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #   - checkout
+  #   - restore_cache:
+  #       keys: [backend-build]
+  #   - run:
+  #       name: Back-end test
+  #       command: |
+  #          cd backend
+  #          npm install
+  #          npm run test
             
-  scan-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys: [frontend-build]
-      - run:
-          name: Front-end audit
-          command: |
-             cd frontend
-             npm audit fix --audit-level=critical --force
+  # scan-frontend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys: [frontend-build]
+  #     - run:
+  #         name: Front-end audit
+  #         command: |
+  #            cd frontend
+  #            npm audit fix --audit-level=critical
 
-  scan-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Back-end audit
-          command: |
-             cd backend
-             npm audit fix --audit-level=critical --force
+  # scan-backend:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys: [backend-build]
+  #     - run:
+  #         name: Back-end audit
+  #         command: |
+  #            cd backend
+  #            npm audit fix --audit-level=critical
 
   # deploy-infrastructure:
   #   docker:
@@ -445,14 +418,14 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
       # - deploy-infrastructure:
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:

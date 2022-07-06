@@ -181,39 +181,39 @@ jobs:
       - destroy-environment: 
           workflow_id: ${CIRCLE_WORKFLOW_ID}   
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image: python:3.7-alpine3.12
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["8a:eb:67:5d:01:db:0f:c4:93:33:85:db:10:3d:4d:84:26:62:f9:5c"]
-  #     - attach_workspace:
-  #         at: ./.circleci/ansible
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --no-cache \
-  #               python3 \
-  #               py3-pip \
-  #           && pip3 install --upgrade pip \
-  #           && pip3 install \
-  #               awscli \
-  #           && rm -rf /var/cache/apk/*
-  #           apk add --update ansible
-  #     - run:
-  #         name: verify ansible hosts
-  #         command: |
-  #           ansible all --list-hosts
-  #     - run:
-  #         name: Configure server
-  #         working_directory: ./.circleci/ansible
-  #         command: |
-  #           echo PWD $(pwd)
-  #           ansible-playbook -i inventory.txt configure-server.yml
-  # #     # Here's where you will add some code to rollback on failure    
-  #     - destroy-environment: 
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID}  
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.12
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["8a:eb:67:5d:01:db:0f:c4:93:33:85:db:10:3d:4d:84:26:62:f9:5c"]
+      - attach_workspace:
+          at: ./.circleci/ansible
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache \
+                python3 \
+                py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install \
+                awscli \
+            && rm -rf /var/cache/apk/*
+            apk add --update ansible
+      - run:
+          name: verify ansible hosts
+          command: |
+            ansible all --list-hosts
+      - run:
+          name: Configure server
+          working_directory: ./.circleci/ansible
+          command: |
+            echo PWD $(pwd)
+            ansible-playbook -i inventory.txt configure-server.yml
+  #     # Here's where you will add some code to rollback on failure    
+      - destroy-environment: 
+          workflow_id: ${CIRCLE_WORKFLOW_ID}  
 
   # run-migrations:
   #   docker:
@@ -432,8 +432,8 @@ workflows:
           filters:
             branches:
               only: [master]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
